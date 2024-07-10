@@ -1,3 +1,4 @@
+import { User } from "@/models/user";
 import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
 
@@ -25,4 +26,15 @@ export const generateToken = (_id) => {
   );
 
   return token;
+};
+
+export const checkAuth = async (req) => {
+  const cookie = req.headers.cookie;
+  if (!cookie) return null;
+
+  const token = cookie.split("=")[1];
+
+  const decoded = jwt.verify(token, JWT_SECRET);
+
+  return await User.findById(decoded._id);
 };

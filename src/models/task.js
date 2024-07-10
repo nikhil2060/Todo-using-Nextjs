@@ -14,10 +14,9 @@ const TaskSchema = new mongoose.Schema({
     default: false,
   },
   user: {
-    type: String,
-    // type: mongoose.Schema.Types.ObjectId,
-    // required: true,
-    // ref: "User",
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
   },
   createdAt: {
     type: Date,
