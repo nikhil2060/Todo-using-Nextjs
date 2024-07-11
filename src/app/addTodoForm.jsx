@@ -1,14 +1,66 @@
 "use client";
 
-import React from "react";
+import React, { useContext, useState } from "react";
+import { toast } from "react-hot-toast";
+import { redirect, useRouter } from "next/navigation";
+import { Context } from "@/components/clients";
 
 const AddTodoForm = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const { user } = useContext(Context);
+
+  const router = useRouter();
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("/api/newTask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) return toast.error(data.message);
+
+      toast.success(data.message);
+
+      router.refresh();
+
+      setTitle("");
+
+      setDescription("");
+    } catch (error) {
+      return toast.error(error.message);
+    }
+  };
+
+  if (!user?._id) return redirect("/login");
+
   return (
     <div className="login">
       <section>
-        <form>
-          <input type="text" placeholder="Task Title" />
-          <input type="text" placeholder="Task Description" />
+        <form onSubmit={submitHandler}>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            type="text"
+            placeholder="Task Title"
+          />
+          <input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            type="text"
+            placeholder="Task Description"
+          />
           <button type="submit">Add Task</button>
         </form>
       </section>

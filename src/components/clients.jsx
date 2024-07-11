@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/router";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -19,12 +19,7 @@ export const ContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <Context.Provider
-      value={{
-        user,
-        setUser,
-      }}
-    >
+    <Context.Provider value={{ user, setUser }}>
       {children}
       <Toaster />
     </Context.Provider>
@@ -61,37 +56,50 @@ export const LogoutBtn = () => {
 
 export const TodoButton = ({ id, completed }) => {
   // const router = useRouter();
+
   const deleteHandler = async (id) => {
-    // try {
-    //   const res = await fetch(`/api/task/${id}`, {
-    //     method: "DELETE",
-    //   });
-    //   const data = await res.json();
-    //   if (!data.success) return toast.error(data.message);
-    //   toast.success(data.message);
-    //   router.refresh();
-    // } catch (error) {
-    //   return toast.error(error);
-    // }
+    try {
+      const res = await fetch(`/api/Task/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!data.success) return toast.error(data.message);
+      toast.success(data.message);
+      // router.refresh();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      return toast.error(error.message);
+    }
   };
 
-  // const updateHandler = async (id) => {
-  //   try {
-  //     const res = await fetch(`/api/task/${id}`, {
-  //       method: "PUT",
-  //     });
-  //     const data = await res.json();
-  //     if (!data.success) return toast.error(data.message);
-  //     toast.success(data.message);
-  //     router.refresh();
-  //   } catch (error) {
-  //     return toast.error(error);
-  //   }
-  // };
+  const updateHandler = async (id) => {
+    try {
+      const res = await fetch(`/api/Task/${id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!data.success) return toast.error(data.message);
+      toast.success(data.message);
+      // router.refresh();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      return toast.error(error.message);
+    }
+  };
 
   return (
     <>
-      <input type="checkbox" checked={completed} />
+      <input
+        type="checkbox"
+        checked={completed}
+        onChange={() => updateHandler(id)}
+      />
       <button className="btn" onClick={() => deleteHandler(id)}>
         Delete
       </button>
