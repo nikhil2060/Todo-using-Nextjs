@@ -2,8 +2,6 @@ import { User } from "@/models/user";
 import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = "asdasdkjsafkjnaskjsaknkajnanlnasdmnaskdnkajsndk";
-
 export const cookieSetter = (res, token, set) => {
   res.setHeader(
     "Set-Cookie",
@@ -22,7 +20,7 @@ export const generateToken = (_id) => {
     {
       _id,
     },
-    JWT_SECRET
+    process.env.JWT_SECRET
   );
 
   return token;
@@ -34,7 +32,7 @@ export const checkAuth = async (req) => {
 
   const token = cookie.split("=")[1];
 
-  const decoded = jwt.verify(token, JWT_SECRET);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   return await User.findById(decoded._id);
 };
