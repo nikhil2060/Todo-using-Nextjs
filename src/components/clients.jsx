@@ -1,27 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import React, { createContext, useContext, useState } from "react";
+import { redirect } from "next/navigation";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
-const Context = createContext({ user: {} });
+export const Context = createContext({ user: {} });
 
 export const ContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
 
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setUser(data.user);
+      });
+  }, []);
+
   return (
-    <Context.Provider value={(user, setUser)}>{children}</Context.Provider>
+    <Context.Provider
+      value={{
+        user,
+        setUser,
+      }}
+    >
+      {children}
+      <Toaster />
+    </Context.Provider>
   );
 };
 
 export const LogoutBtn = () => {
-  const { user } = useContext(Context);
+  const { user, setUser } = useContext(Context);
 
-  const logoutHandler = () => {
-    alert("Logged out");
+  const logoutHandler = async () => {
+    try {
+      const res = await fetch("/api/auth/logout");
+
+      const data = await res.json();
+
+      if (!data.success) toast.error(data.message);
+
+      setUser({});
+
+      toast.success(data.message);
+    } catch (error) {
+      return toast.error(error.message);
+    }
   };
 
-  return user?.id ? (
-    <button onClick={logoutHandler}>Logout</button>
+  return user._id ? (
+    <button className="btn" onClick={logoutHandler}>
+      Logout
+    </button>
   ) : (
     <Link href={"/login"}>Login</Link>
   );
