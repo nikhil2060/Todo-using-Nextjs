@@ -28,6 +28,8 @@ const handler = asyncError(async (req, res) => {
     password: hashedPassword,
   });
 
+  console.log(user);
+
   const token = generateToken(user?._id);
 
   cookieSetter(res, token, true);
